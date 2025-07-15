@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Love Storybook - Falling Hearts</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Battambang&family=Dancing+Script&display=swap");
+
+      body {
+        background: #ffe6f0;
+        font-family: "Battambang", "Dancing Script", cursive, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Heart falling container covers entire screen */
+      .heart-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none; /* Let clicks pass through */
+        overflow: visible;
+        z-index: 1000;
+      }
+
+      .heart {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background-color: #f78fb3;
+        transform: rotate(-45deg);
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        opacity: 0.8;
+      }
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background-color: #f78fb3;
+        border-radius: 50%;
+      }
+      .heart::before {
+        top: -12.5px;
+        left: 0;
+      }
+      .heart::after {
+        top: 0;
+        left: 12.5px;
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(-50px) rotate(-45deg);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(700px) rotate(-45deg);
+          opacity: 0;
+        }
+      }
+
+      .book {
+        width: 480px;
+        height: 650px;
+        background: white;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+      }
+
+      .cover {
+        background: linear-gradient(135deg, #f8a5c2, #f78fb3);
+        color: white;
+        flex-shrink: 0;
+        padding: 40px 30px;
+        text-align: center;
+        font-family: "Dancing Script", cursive;
+      }
+
+      .cover h1 {
+        font-size: 3.5rem;
+        margin-bottom: 0;
+      }
+
+      .cover p {
+        font-size: 1.25rem;
+        margin-top: 0.5rem;
+        opacity: 0.85;
+      }
+
+      .page-content {
+        flex-grow: 1;
+        padding: 20px 35px 10px;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        color: #333;
+        overflow-y: auto;
+        background: #fff0f6;
+        text-align: center;
+        direction: ltr;
+      }
+
+      .page-content p {
+        margin-top: 0;
+        white-space: pre-line; /* Preserve line breaks */
+      }
+
+      .page-image {
+        max-width: 90%;
+        max-height: 220px;
+        margin: 15px auto 5px;
+        border-radius: 15px;
+        box-shadow: 0 6px 15px rgba(247, 143, 179, 0.5);
+        object-fit: cover;
+      }
+
+      .controls {
+        background: #f8a5c2;
+        padding: 15px 25px;
+        text-align: center;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .btn {
+        background: white;
+        color: #f78fb3;
+        border: none;
+        font-size: 1rem;
+        padding: 10px 25px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .btn:hover:not(:disabled) {
+        background-color: #f78fb3;
+        color: white;
+      }
+
+      /* Fade animation for page content */
+      .fade {
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Music toggle button */
+      #musicToggle {
+        font-size: 1.2rem;
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        padding: 8px 18px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      #musicToggle:hover {
+        background-color: white;
+        color: #f78fb3;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Heart container for falling hearts -->
+    <div class="heart-container" id="heartContainer"></div>
+
+    <div
+      class="book"
+      role="main"
+      aria-label="Love storybook with images, music, and falling hearts"
+    >
+      <div class="cover" id="coverPage">
+        <h1>I love You My love Roth</h1>
+        <p>A journey through time and feelings</p>
+      </div>
+
+      <div class="page-content fade" id="pageContent" style="display: none">
+        <p></p>
+        <img src="" alt="Love story image" class="page-image" id="pageImage" />
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="prevBtn" disabled aria-label="Previous page">
+          ← Back
+        </button>
+        <button class="btn" id="nextBtn" aria-label="Next page">Next →</button>
+        <button id="musicToggle" aria-label="Toggle background music">
+          🔈 Play Music
+        </button>
+      </div>
+    </div>
+
+    <!-- Background music -->
+    <audio id="bgMusic" loop>
+      <source src="love-360958.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <script>
+      const pages = [
+        {
+          text: `I Love You, Baby
+You are the sunshine in my life,
+The beat in my heart,
+My forever and always.
+I love you more than words can say, baby.`,
+          img: "photo_2025-07-15_23-27-01.jpg",
+        },
+        {
+          text: `Every moment with you feels like a beautiful dream,
+And I thank my lucky stars that you’re mine.
+No matter what comes our way,
+I promise to love you, support you, and cherish you forever.`,
+          img: "photo_2025-07-15_23-32-20.jpg",
+        },
+        {
+          text: `You’re my everything, baby,`,
+          img: "photo_2025-07-15_23-32-42.jpg",
+        },
+        {
+          text: `And I’ll never stop loving you.`,
+          img: "photo_2025-07-15_23-35-34.jpg",
+        },
+      ];
+
+      const coverPage = document.getElementById("coverPage");
+      const pageContent = document.getElementById("pageContent");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const pageImage = document.getElementById("pageImage");
+      const bgMusic = document.getElementById("bgMusic");
+      const musicToggle = document.getElementById("musicToggle");
+      const heartContainer = document.getElementById("heartContainer");
+
+      let currentPage = -1; // -1 means cover page
+      let musicPlaying = false;
+
+      function updatePage() {
+        if (currentPage === -1) {
+          coverPage.style.display = "block";
+          pageContent.style.display = "none";
+          prevBtn.disabled = true;
+          nextBtn.disabled = false;
+        } else {
+          coverPage.style.display = "none";
+          pageContent.style.display = "block";
+
+          pageContent.classList.remove("fade");
+          void pageContent.offsetWidth; // restart animation
+          pageContent.classList.add("fade");
+
+          pageContent.querySelector("p").textContent = pages[currentPage].text;
+          pageImage.src = pages[currentPage].img;
+          pageImage.alt = `Love story image page ${currentPage + 1}`;
+
+          prevBtn.disabled = currentPage === 0;
+          nextBtn.disabled = currentPage === pages.length - 1;
+        }
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentPage > -1) {
+          currentPage--;
+          updatePage();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentPage < pages.length - 1) {
+          currentPage++;
+          updatePage();
+        }
+      });
+
+      musicToggle.addEventListener("click", () => {
+        if (musicPlaying) {
+          bgMusic.pause();
+          musicToggle.textContent = "🔈 Play Music";
+          musicPlaying = false;
+        } else {
+          bgMusic.play();
+          musicToggle.textContent = "🔊 Pause Music";
+          musicPlaying = true;
+        }
+      });
+
+      // Function to create a single heart element with random start position and animation duration
+      function createHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * window.innerWidth + "px";
+        heart.style.animationDuration = 4 + Math.random() * 4 + "s";
+        heart.style.fontSize = 10 + Math.random() * 20 + "px";
+        heart.style.opacity = Math.random();
+        heartContainer.appendChild(heart);
+
+        // Remove heart after animation ends to clean DOM
+        heart.addEventListener("animationend", () => {
+          heart.remove();
+        });
+      }
+
+      // Create multiple hearts at intervals
+      setInterval(createHeart, 350);
+
+      // Initialize the first view
+      updatePage();
+    </script>
+  </body>
+</html>
